@@ -29,6 +29,60 @@ const gradientTexture = new THREE.TextureLoader().load('assets/texture_Gradient.
 const otherGradientTexture = new THREE.TextureLoader().load('assets/texture_OtherGradient.png');
 scene.background = fullMoonNightTexture;
 
+//Loading partical effect
+const particleParams = {
+    count: 200,
+    size: 0.15,
+    speed: 1.0
+};
+
+let particleGeometry, particleMaterial, particles, basePositions;
+
+
+function createParticles() {
+    //Remove existing particles
+    if (particles) {
+        scene.remove(particles);
+        particleGeometry.dispose();
+        particleMaterial.dispose();
+    }
+
+    const positions = [];
+    basePositions = [];
+
+    for (let i = 0; i < particleParams.count; i++) {
+        const x = (Math.random() - 0.5) * 10;
+        const y = (Math.random() - 0.5) * 5 + 2; // Add y-axis offset
+        const z = (Math.random() - 0.5) * 10;
+        positions.push(x, y, z);
+        basePositions.push({ x, y, z });
+    }
+
+    particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+    const particleTexture = new THREE.TextureLoader().load('assets/particle_star.png');
+    particleTexture.colorSpace = THREE.SRGBColorSpace;
+
+    particleMaterial = new THREE.PointsMaterial({
+        size: particleParams.size,
+        sizeAttenuation: true,
+        map: particleTexture,
+        alphaTest: 0.5,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        opacity: 0.8
+    });
+
+    particleMaterial.color.setHSL(0.05, 1.0, 0.6);
+
+    particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+}
+
+createParticles();
+
 //Lighting
 scene.add(new THREE.AmbientLight(0x36354d, 2)); //Ambient Lighting
 
@@ -185,6 +239,15 @@ camFolder.add(spinParams, 'speed', 100,2000).name('Rotating Speed');
 camFolder.add(spinParams, 'distance', 2,20).name('Camera Distance');
 camFolder.open();
 
+const particleFolder = gui.addFolder('Particles');
+particleFolder.add(particleParams, 'count', 100, 5000, 100).name("Amount").onChange(createParticles);
+particleFolder.add(particleParams, 'size', 0.05, 1).name("Size").onChange(() => {
+    particleMaterial.size = particleParams.size;
+});
+particleFolder.add(particleParams, 'speed', 0.1, 5).name("Speed");
+particleFolder.open();
+
+
 //Camera rotation, used modified Saty's code
 function rotateCam(){
     const timer = Date.now()*(1/(2050-spinParams.speed));
@@ -210,5 +273,29 @@ function animate() {
     requestAnimationFrame(animate);
     rotateCam();
     controls.update();
+    const time = Date.now() * 0.00005;
+
+    //Particle effect color change
+    const h = 0.0 + 0.1 * (0.5 + 0.5 * Math.sin(time));
+    particleMaterial.color.setHSL(h, 1.0, 0.6);
+
+    //Particle effect movement
+    if (particles && particleGeometry) {
+        const positions = particleGeometry.attributes.position.array;
+        const time = Date.now() * 0.001 * particleParams.speed;
+    
+        for (let i = 0; i < particleParams.count; i++) {
+            const i3 = i * 3;
+            const base = basePositions[i];
+            positions[i3 + 0] = base.x + Math.sin(time + i) * 0.05;
+            positions[i3 + 1] = base.y + Math.sin(time * 1.5 + i) * 0.1;
+            positions[i3 + 2] = base.z + Math.cos(time + i) * 0.05;
+        }
+    
+        particleGeometry.attributes.position.needsUpdate = true;
+    }
+    
+
+
 }
 animate();
