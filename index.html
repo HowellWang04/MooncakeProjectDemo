@@ -3,9 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js STL Loader</title>
+    <title>Three.js STL Project</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background: #333;
+            color: white;
+            font-size: 24px;
+        }
+        #content {
+            display: flex;
+            flex-direction: row;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px 0;
+        }
+        #info {
+            flex: 1;
+            padding: 20px;
+        }
+        #threejs-container {
+            flex: 2;
+            width: 100%;
+            height: 600px;
+            background: #eee;
+        }
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+        }
+    </style>
 </head>
 <body>
+
+    <div id="header">Three.js STL Model Viewer</div>
+
+    <div id="content">
+        <div id="info">
+            <h2>项目介绍</h2>
+            <p>这个项目展示了一个 Three.js STL 文件加载器，可以在网页上查看 3D 模型。</p>
+            <h3>分工</h3>
+            <ul>
+                <li><strong>Alice：</strong>3D 模型设计</li>
+                <li><strong>Bob：</strong>Three.js 代码开发</li>
+                <li><strong>Charlie：</strong>前端网页设计</li>
+            </ul>
+        </div>
+        <div id="threejs-container"></div>
+    </div>
+
+    <footer>© 2025 Three.js Project - All Rights Reserved</footer>
+
     <script type="module" src="main.js"></script>
+
 </body>
 </html>
